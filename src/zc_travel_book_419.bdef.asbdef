@@ -1,0 +1,22 @@
+projection;
+strict ( 2 );
+use draft;
+
+define behavior for ZC_TRAVEL_BOOK_419 alias Booking
+{
+  use create;
+  use update;
+  use delete;
+
+  // Actions ko use karne ke liye project kiya
+  use action approveBooking;
+  use action rejectBooking;
+  use action cancelBooking;
+  use action completeJourney;
+
+  use action Edit;
+  use action Activate;
+  use action Discard;
+  use action Resume;
+  use action Prepare;
+}

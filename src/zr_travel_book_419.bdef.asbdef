@@ -1,0 +1,69 @@
+managed implementation in class zbp_r_travel_book_419 unique;
+strict ( 2 );
+with draft;
+
+define behavior for ZR_TRAVEL_BOOK_419 alias Booking
+persistent table ztravel_book_419
+draft table ztravel_419_drf
+lock master total etag LocalLastChangedAt
+authorization master ( global )
+{
+  create;
+  update;
+  delete;
+
+  // Key aur timestamp fields readonly honge
+  field ( mandatory ) BookingId; // Wapas mandatory kar diya
+  field ( readonly ) LocalLastChangedAt;
+
+  // 5. Audit Fields ko readonly rakha (system isse automatic update karega)
+  field ( readonly ) CreatedBy, CreatedAt, LastChangedBy, LastChangedAt;
+
+  // 12. Dynamic Feature Control (Approval ke baad fields readonly karne ke liye)
+  field ( features : instance ) CustomerName, TravelDate, ReturnDate, Destination, BookingFee, Email, Seats;
+  field ( readonly ) Status, CurrencyCode;
+
+  // Determinations
+  determination setInitialValues on modify { create; }
+
+  // 2. Validations
+  validation validatePassenger on save { field CustomerName, Email, Seats; }
+  validation validateDates on save { field TravelDate, ReturnDate; }
+  validation validatePrice on save { field BookingFee; }
+
+  // 3. Actions with Dynamic Feature Control
+  action ( features : instance ) approveBooking result [1] $self;
+  action ( features : instance ) rejectBooking result [1] $self;
+  action ( features : instance ) cancelBooking result [1] $self;
+  action ( features : instance ) completeJourney result [1] $self;
+
+  // Draft ke standard configurations
+  draft action Edit;
+  draft action Activate;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare {
+    validation validatePassenger;
+    validation validateDates;
+    validation validatePrice;
+  }
+
+  mapping for ztravel_book_419
+  {
+    BookingId = booking_id;
+    CustomerName = customer_name;
+    TravelDate = travel_date;
+    ReturnDate = return_date;
+    Destination = destination;
+    Email = email;
+    Seats = seats;
+    BookingFee = booking_fee;
+    CurrencyCode = currency_code;
+    Status = status;
+    LocalLastChangedAt = local_last_changed_at;
+    CreatedBy = created_by;
+    CreatedAt = created_at;
+    LastChangedBy = last_changed_by;
+    LastChangedAt = last_changed_at;
+  }
+}

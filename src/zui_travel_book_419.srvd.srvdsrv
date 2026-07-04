@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service Definition for Booking'
+define service ZUI_TRAVEL_BOOK_419 {
+  expose ZC_TRAVEL_BOOK_419 as Booking;
+}
